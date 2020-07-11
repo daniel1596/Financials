@@ -1,0 +1,14 @@
+<p>This thing is a balance sheet. Assets are:</p>
+
+<strong>Cash and Cash Equivalents</strong>
+
+<strong>Marketable Securities</strong>
+
+<strong>Long-term Assets</strong>
+
+<ul>
+    {% for asset in balance_sheet.assets %}
+        <li>{{ asset.name }} {{ asset }}</li>
+    {% endfor %}
+</ul>
+
