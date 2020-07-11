@@ -1,7 +1,12 @@
 from py.financials.balance_sheet.DebtType import DebtType
 
 
-class Asset:
+class BalanceSheetItem:
+    """Base class for assets, liabilities, and shareholder equity."""
+    monetary_value: float
+
+
+class Asset(BalanceSheetItem):
     """Base class for all assets."""
     name: str
 
