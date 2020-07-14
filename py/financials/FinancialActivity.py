@@ -3,7 +3,7 @@ from py.financials.balance_sheet.Assets import Asset
 
 
 class FinancialActivity:
-    """Base class (I think) for incomes and expenses"""
+    """Base class (I think) for transactions, capital gains (realized), expenses, etc."""
     def __init__(self, amount: float):
         self.amount = amount
 
