@@ -8,7 +8,7 @@ from py.scripting.FinancialActivities import get_financial_activities
 app = Flask(__name__)
 
 @app.route('/api/income_statement')
-def generate_income_statement()
+def generate_income_statement():
     # TODO make year and quarter query string parameters here
     return IncomeStatement.generate(2020, Quarter.Q3)
 
