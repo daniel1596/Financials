@@ -1,0 +1,30 @@
+{% macro create_accordion_card(card_title) %}
+    {% set card_header_id = "heading" + card_title %}
+    {% set card_body_holder = card_title.lower() + "Data" %}
+
+    <div class="card">
+        {# If desiring to add up-down arrows when sections are toggled, see https://stackoverflow.com/a/46778779  #}
+        <div class="card-header" id="{{ card_header_id }}">
+            <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#{{ card_body_holder }}" aria-expanded="true" aria-controls="{{ card_body_holder }}">
+                  {{ card_title }}
+                </button>
+            </h2>
+        </div>
+        {# Add "show" to CSS classes of card body holder if desired #}
+        <div id="{{ card_body_holder }}" class="collapse" aria-labelledby="{{ card_header_id }}" data-parent="#incomeStatementAccordion">
+            <div class="card-body">
+                {% include 'partial/income_statement/' + card_title + '.html' %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+<h4>Income statement for {{ income_statement.quarter_ui }} {{ income_statement.year }}</h4>
+
+<div class="accordion" id="incomeStatementAccordion">
+    {{ create_accordion_card('Revenue') }}
+    {{ create_accordion_card('Expenses') }}
+</div>
+
+<p>Net income: {{ income_statement.net_income_ui }}</p>

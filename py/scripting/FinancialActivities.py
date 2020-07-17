@@ -2,15 +2,16 @@ from datetime import date
 from typing import List, Optional
 
 from py.financials.Quarter import Quarter
-from py.financials.activities.Expenses import Expense
+from py.financials.activities.expenses.OperatingExpenses import OperatingExpense
 from py.financials.activities.FinancialActivity import FinancialActivity
 from py.financials.activities.PurchaseCategory import PurchaseCategory
-
+from py.financials.income_statement.IncomeStatementCategory import ExpenseCategory
 
 
 # This variable really should be coming from a db, but maybe one day
 _all_financial_activities = [
-    Expense(50, date(2020, 7, 13)   , PurchaseCategory.MEDICAL)
+    OperatingExpense(50, date(2020, 7, 13), PurchaseCategory.MEDICAL),
+    OperatingExpense(53.33, date(2020, 7, 13), PurchaseCategory.UTILITIES)  # Internet
 ]
 
 
