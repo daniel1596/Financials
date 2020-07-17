@@ -4,8 +4,9 @@ from enum import Enum, auto
 class PurchaseCategory(Enum):
     BOOKS = auto()
     CAR_MAINTENANCE = auto()  # separate from gas?
-    CERTIFICATE_OF_DEPOSIT = auto()
+    # CERTIFICATE_OF_DEPOSIT = auto()
     CLOTHING = auto()
+    DINING = auto()
     EDUCATION = auto()
     ENTERTAINMENT = auto()
     EXERCISE = auto()
