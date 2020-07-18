@@ -5,7 +5,7 @@
         {% block additional_scripts %}{% endblock %}
 	</head>
 	<body>
-        <header></header> <!-- Not sure if there will be a header -->
+        <header>{% include 'partial/header.html' %}</header>
 		<main>{% block main_content %}{% endblock %}</main>
 	</body>
 </html>

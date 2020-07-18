@@ -25,7 +25,6 @@ def generate_income_statement():
 @app.route('/')
 def hello_world():
     return render_template('index.html', balance_sheet=balance_sheet,
-                           income_statements=IncomeStatementFactory.generate_QOQ_statements(2020, Quarter.Q3),
                            income_statement_categories=income_statement_categories)
 
 

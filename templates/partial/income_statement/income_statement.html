@@ -1,31 +1,70 @@
-<h4>Income statements</h4>
+<h3>Income statement</h3>
 
-<section class="mb-3">
-    <div class="form-check-inline">
-        <input class="form-check-input" type="radio" name="exampleRadios" id="radioQOQ" value="QOQ" checked>
-        <label class="form-check-label" for="radioQOQ">Show QOQ</label>
-    </div>
-    <div class="form-check-inline">
-        <input class="form-check-input" type="radio" name="exampleRadios" id="radioYOY" value="YOY">
-        <label class="form-check-label" for="radioYOY">Show YOY</label>
-    </div>
-</section>
-
-<div class="container">
-    <div class="row">
-        <div class="col"></div>
-        {% for income_statement in income_statements %}
-            <div class="col">
-                <strong>{{ income_statement.quarter_ui }} {{ income_statement.year }}</strong>
+<div id="incomeStatementRoot">
+    <form class="mb-3">
+        <label for="startingYearSelect">Select starting year and quarter: </label>
+        <select id="startingYearSelect" v-model="startingYearSelect">
+            <option v-for="year in [2020, 2019]">[[ year ]]</option>
+        </select>
+        <select id="startingQuarterSelect" v-model="startingQuarterSelect">
+            <option v-for="quarter in ['Q4', 'Q3', 'Q2', 'Q1']">[[ quarter ]]</option>
+        </select>
+        <span class="ml-2">
+            <div class="form-check-inline" v-for="timePeriodType in ['QOQ', 'YOY']">
+                <input class="form-check-input" type="radio" :id="'radio' + timePeriodType" :value="timePeriodType" v-model="timePeriod">
+                <label class="form-check-label" :for="'radio' + timePeriodType">Show [[ timePeriodType ]]</label>
             </div>
-        {% endfor %}
-    </div>
-    {% for category in income_statement_categories %}
-        <div class="row">
-            <div class="col">{{ category.title }}</div>
-            {% for income_statement in income_statements %}
-                <div class="col">{{ income_statement | attr(category.attribute) }}</div>
-            {% endfor %}
-        </div>
-    {% endfor %}
+        </span>
+        <button type="button" class="btn btn-sm btn-dark" @click="testing()">Update chart</button>
+    </form>
 </div>
+
+{#
+I think including Tabulator will be the next step. It's the eaiest way to have collapsible table data.
+http://tabulator.info/docs/4.7/frameworks#vue
+http://tabulator.info/examples/4.7#tree
+#}
+
+{#<div class="container">#}
+{#    <div class="row">#}
+{#        <div class="col"></div>#}
+{#        {% for income_statement in income_statements %}#}
+{#            <div class="col">#}
+{#                <strong>{{ income_statement.quarter_ui }} {{ income_statement.year }}</strong>#}
+{#            </div>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{#    {% for category in income_statement_categories %}#}
+{#        <div class="row">#}
+{#            <div class="col">{{ category.title }}</div>#}
+{#            {% for income_statement in income_statements %}#}
+{#                <div class="col">{{ income_statement | attr(category.attribute) }}</div>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#    {% endfor %}#}
+{#</div>#}
+
+<script>
+    const incomeStatement = new Vue({
+      el: "#incomeStatementRoot",
+      delimiters: ['[[', ']]'],  // the default is curly braces, but this would conflict with Jinja syntax
+      data: {
+        incomeStatements: [],
+        startingQuarterSelect: 'Q3',
+        startingYearSelect: 2020,
+        timePeriod: 'QOQ'
+      },
+      methods: {
+        loadData: async function () {
+          this.incomeStatements = (await axios.get("/api/income_statement")).data
+          console.log(this.incomeStatements)
+        },
+        testing: function() {
+          alert(`You have selected a ${this.timePeriod} analysis for ${this.startingQuarterSelect} ${this.startingYearSelect}`)
+        }
+      },
+      mounted: async function () {
+        this.loadData()
+      }
+    })
+</script>
