@@ -3,18 +3,38 @@ from enum import Enum, auto
 
 class IncomeStatementCategory:
     """Base class for categories of the income statement. Revenues and expenses can have the actual income."""
-    pass
+    def __init__(self, title: str, attribute: str):
+        self.title = title
+        self.attribute = attribute
 
-"""
- Note - I'm not sure if these should be two separate enums or not
- I feel like there will be some things that will be expenses vs revenues but I'm not sure
-"""
 
-class ExpenseCategory(IncomeStatementCategory):
-    INTEREST = auto()
-    OPERATING = auto()
+class ExpenseCategory(IncomeStatementCategory, Enum):
+    INCOME_TAX = ('Income tax loss (gain)', 'income_tax_loss')
+    # INTEREST = ('')
+    NON_OPERATING = ('Non-operating expenses', 'non_operating_expenses')
+    OPERATING = ('Operating expenses', 'operating_expenses')
 
+
+class ProfitCategory(IncomeStatementCategory, Enum):
+    """Some of these terms could be used interchangeably with income, like 'Gross profit' vs 'Gross income'... oh well"""
+    BEFORE_TAXES = ('Income before taxes', 'income_before_taxes')
+    NET_INCOME = ('Net income', 'net_income_ui')
+    OPERATING = ('Operating income', 'operating_income')
 
 class RevenueCategory(IncomeStatementCategory, Enum):
-    INTEREST = auto()
-    OPERATING = auto()
+    INTEREST = ('Interest revenue', 'interest_revenue')
+    OPERATING = ('Revenue', 'operating_revenue')
+
+
+income_statement_categories = [
+    # In order of how they will appear on the balance sheet, top line to bottom
+    RevenueCategory.OPERATING,
+    # For personal finance purposes, gross profit = revenue because there are no COGS. So it's not a separate line item.
+    ExpenseCategory.OPERATING,
+    ProfitCategory.OPERATING,
+    RevenueCategory.INTEREST,
+    ExpenseCategory.NON_OPERATING,
+    ProfitCategory.BEFORE_TAXES,
+    ExpenseCategory.INCOME_TAX,
+    ProfitCategory.NET_INCOME
+]

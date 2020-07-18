@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 from py.financials.Quarter import Quarter
-from py.financials.activities.expenses.Expense import Expense
 from py.financials.activities.FinancialActivity import FinancialActivity
 from py.financials.income_statement.IncomeStatementCategory import RevenueCategory, ExpenseCategory, \
     IncomeStatementCategory
@@ -15,16 +14,17 @@ class IncomeStatement:
     """
 
     @property
-    def revenue_total(self) -> float:
-        return self.revenue_operating + self.revenue_non_operating + self.gains
+    def operating_income(self):
+        return self.operating_revenue - self.operating_expenses
 
     @property
-    def expenses_total(self) -> float:
-        return self.expenses_operating + self.expenses_non_operating + self.losses
+    def income_before_taxes(self) -> float:
+        return self.operating_income + self.interest_revenue - self.non_operating_expenses
 
     @property
     def net_income(self) -> float:
-        return self.revenue_total - self.expenses_total
+        """This is equal to after-tax income because I have no "Minority Interest and Equity in Affiliates"."""
+        return self.income_before_taxes - self.income_tax_loss
 
     @property
     def net_income_ui(self) -> str:
@@ -41,10 +41,11 @@ class IncomeStatement:
         """Create an income statement from a pre-filtered list of financial activities."""
         self.year = year
         self.quarter = quarter
-        self.revenue_operating = self._sum_amount_by_category(activities, RevenueCategory.OPERATING)
-        self.expenses_operating = self._sum_amount_by_category(activities, ExpenseCategory.OPERATING)
-        self.revenue_non_operating = self._sum_amount_by_category(activities, RevenueCategory.INTEREST) + 0 # can add more if needed
-        self.expenses_non_operating = self._sum_amount_by_category(activities, ExpenseCategory.INTEREST) + 0
+        self.operating_revenue = self._sum_amount_by_category(activities, RevenueCategory.OPERATING)
+        self.operating_expenses = self._sum_amount_by_category(activities, ExpenseCategory.OPERATING)
+        self.interest_revenue = self._sum_amount_by_category(activities, RevenueCategory.INTEREST)
+        self.non_operating_expenses = self._sum_amount_by_category(activities, ExpenseCategory.NON_OPERATING)
+        self.income_tax_loss = self._sum_amount_by_category(activities, ExpenseCategory.INCOME_TAX)
         self.gains = 0
         self.losses = 0
 
