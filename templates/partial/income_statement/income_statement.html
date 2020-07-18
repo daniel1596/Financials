@@ -24,7 +24,7 @@ I think including Tabulator will be the next step. It's the eaiest way to have c
 http://tabulator.info/docs/4.7/frameworks#vue
 http://tabulator.info/examples/4.7#tree
 #}
-
+{##}
 {#<div class="container">#}
 {#    <div class="row">#}
 {#        <div class="col"></div>#}
@@ -60,7 +60,7 @@ http://tabulator.info/examples/4.7#tree
           console.log(this.incomeStatements)
         },
         testing: function() {
-          alert(`You have selected a ${this.timePeriod} analysis for ${this.startingQuarterSelect} ${this.startingYearSelect}`)
+          console.log(`You have selected a ${this.timePeriod} analysis for ${this.startingQuarterSelect} ${this.startingYearSelect}`)
         }
       },
       mounted: async function () {

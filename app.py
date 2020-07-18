@@ -5,10 +5,20 @@ from py.financials.Quarter import Quarter
 from py.financials.balance_sheet.BalanceSheetFactory import balance_sheet
 from py.financials.income_statement.IncomeStatement import IncomeStatement
 from py.financials.income_statement.IncomeStatementCategory import income_statement_categories
+from py.scripting.FinancialActivities import get_financial_activities
 from py.scripting.IncomeStatementFactory import IncomeStatementFactory
 
 app = Flask(__name__)
 
+
+@app.route('/api/income_statements/all')
+def generate_all_income_statements():
+    financial_activities = get_financial_activities()
+    activity_years = (act.date.year for act in financial_activities)
+
+    # The query string parameters work! But again, todo should be using a ViewModel for this
+    return ""
+    # return encode(IncomeStatement.generate(year))
 
 @app.route('/api/income_statement')
 def generate_income_statement():
