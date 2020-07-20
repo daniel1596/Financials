@@ -11,14 +11,6 @@ class FinancialActivity:
         self.date = date_
         self.income_statement_category = income_statement_category
 
-    @property
-    def amount_ui(self) -> str:
-        """
-        Forcing two decimal places for the front-end display.
-        The "Expense" subclass will override this to put parentheses around
-        """
-        return "{:,.2f}".format(self.amount)
-
 
 class AssetTransfer(FinancialActivity):
     """

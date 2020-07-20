@@ -17,54 +17,54 @@
         </span>
         <button type="button" class="btn btn-sm btn-dark" @click="testing()">Update chart</button>
     </form>
+    <div class="container">
+      <div id="incomeStatementTable"></div> <!-- Tabulator to inject here -->
+    </div>
 </div>
 
-{#
-I think including Tabulator will be the next step. It's the eaiest way to have collapsible table data.
-http://tabulator.info/docs/4.7/frameworks#vue
-http://tabulator.info/examples/4.7#tree
-#}
-{##}
-{#<div class="container">#}
-{#    <div class="row">#}
-{#        <div class="col"></div>#}
-{#        {% for income_statement in income_statements %}#}
-{#            <div class="col">#}
-{#                <strong>{{ income_statement.quarter_ui }} {{ income_statement.year }}</strong>#}
-{#            </div>#}
-{#        {% endfor %}#}
-{#    </div>#}
-{#    {% for category in income_statement_categories %}#}
-{#        <div class="row">#}
-{#            <div class="col">{{ category.title }}</div>#}
-{#            {% for income_statement in income_statements %}#}
-{#                <div class="col">{{ income_statement | attr(category.attribute) }}</div>#}
-{#            {% endfor %}#}
-{#        </div>#}
-{#    {% endfor %}#}
-{#</div>#}
 
 <script>
     const incomeStatement = new Vue({
       el: "#incomeStatementRoot",
       delimiters: ['[[', ']]'],  // the default is curly braces, but this would conflict with Jinja syntax
       data: {
+        apiUrlBase: "/api/income_statements",
+        incomeStatementTable: null,
         incomeStatements: [],
         startingQuarterSelect: 'Q3',
         startingYearSelect: 2020,
         timePeriod: 'QOQ'
       },
+      // the following was copy-pasted from Tabulator's website on the Vue page - I don't think we'll need it
+      // but I'm leaving it here for now. I think more likely there will be AJAX GET requests and the table
+      // will update accordingly at that time.
+      // watch: {
+      //   incomeStatements: function(newData) { 
+      //     this.incomeStatementTable.replaceData(incomeStatements)
+      //   }
+      // },
       methods: {
         loadData: async function () {
-          this.incomeStatements = (await axios.get("/api/income_statement")).data
-          console.log(this.incomeStatements)
+          // not using query strings here but will do that for AJAX requests
+          this.incomeStatements = (await axios.get(this.apiUrlBase)).data
+        },
+        setupTabulatorTable: function () {
+          this.incomeStatementTable = new Tabulator("#incomeStatementTable", {
+            data: this.incomeStatements.line_items,
+            columns: [
+              { title: "", field: "field" },
+            ].concat(this.incomeStatements.dates.map((date, index) => ({
+              title: date, field: `value${index}`
+            })))
+          })
         },
         testing: function() {
           console.log(`You have selected a ${this.timePeriod} analysis for ${this.startingQuarterSelect} ${this.startingYearSelect}`)
         }
       },
       mounted: async function () {
-        this.loadData()
+        await this.loadData()
+        this.setupTabulatorTable()
       }
     })
 </script>

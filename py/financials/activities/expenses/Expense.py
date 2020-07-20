@@ -15,7 +15,3 @@ class Expense(FinancialActivity):
                  purchase_category: PurchaseCategory):
         super().__init__(amount, date_, income_sheet_category)
         self.purchase_category = purchase_category
-
-    @property
-    def amount_ui(self) -> str:
-        return "(" + super().amount_ui + ")"  # one of the few instances where string formatting isn't more readable

@@ -10,7 +10,7 @@ class IncomeStatementCategory:
 
 class ExpenseCategory(IncomeStatementCategory, Enum):
     INCOME_TAX = ('Income tax loss (gain)', 'income_tax_loss')
-    # INTEREST = ('')
+    # INTEREST = ('')  # I guess I could add this at some point, if I were to have any
     NON_OPERATING = ('Non-operating expenses', 'non_operating_expenses')
     OPERATING = ('Operating expenses', 'operating_expenses')
 
@@ -18,7 +18,7 @@ class ExpenseCategory(IncomeStatementCategory, Enum):
 class ProfitCategory(IncomeStatementCategory, Enum):
     """Some of these terms could be used interchangeably with income, like 'Gross profit' vs 'Gross income'... oh well"""
     BEFORE_TAXES = ('Income before taxes', 'income_before_taxes')
-    NET_INCOME = ('Net income', 'net_income_ui')
+    NET_INCOME = ('Net income', 'net_income')
     OPERATING = ('Operating income', 'operating_income')
 
 class RevenueCategory(IncomeStatementCategory, Enum):
