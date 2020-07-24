@@ -10,10 +10,10 @@ from py.scripting.FinancialActivities import get_financial_activities
 class IncomeStatement:
     def __init__(self, activities: List[FinancialActivity]):
         """Create an income statement from a pre-filtered list of financial activities."""
-        most_recent_date = max(act.date for act in activities)
-        
-        self.year = most_recent_date.year
-        self.quarter = next(q for q in Quarter if q.includes_month(most_recent_date.month))
+
+        most_recent_date = max(act.date for act in activities) if activities else None
+        self.year = most_recent_date.year if most_recent_date else None
+        self.quarter = next(q for q in Quarter if q.includes_month(most_recent_date.month)) if most_recent_date else None
 
         self.operating_revenue = self._sum_amount_by_category(activities, RevenueCategory.OPERATING)
         self.operating_expenses = self._sum_amount_by_category(activities, ExpenseCategory.OPERATING)

@@ -17,11 +17,11 @@ On the back-end, Python can create the income statement(s) in-memory and expose 
 Vue can take over from there and Tabulator can probably create the calculated columns.
 """
 
-
 @app.route('/api/income_statements')
 def generate_income_statements():
     starting_year = request.args.get('starting_year', default=2020, type=int)
     starting_quarter_number = request.args.get('starting_quarter', default=3, type=int)
+    analysis_type = request.args.get('analysis_type', default='QOQ', type=str) # TODO actually implement this
 
     starting_quarter = next(q for q in Quarter if q.number == starting_quarter_number)
     
@@ -37,7 +37,8 @@ def generate_income_statements():
 
     income_statement_view_model = IncomeStatementsViewModel(income_statements)
 
-    return encode(income_statement_view_model)
+    # in encode(), "unpicklable" set to False removes "py/object" fields
+    return encode(income_statement_view_model, unpicklable=False)
 
 
 
@@ -48,4 +49,4 @@ def hello_world():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

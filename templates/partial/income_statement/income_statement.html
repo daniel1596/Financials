@@ -7,7 +7,7 @@
             <option v-for="year in [2020, 2019]">[[ year ]]</option>
         </select>
         <select id="startingQuarterSelect" v-model="startingQuarterSelect">
-            <option v-for="quarter in ['Q4', 'Q3', 'Q2', 'Q1']">[[ quarter ]]</option>
+            <option v-for="quarter in [4, 3, 2, 1]" :value="quarter">Q[[ quarter ]]</option>
         </select>
         <span class="ml-2">
             <div class="form-check-inline" v-for="timePeriodType in ['QOQ', 'YOY']">
@@ -15,7 +15,6 @@
                 <label class="form-check-label" :for="'radio' + timePeriodType">Show [[ timePeriodType ]]</label>
             </div>
         </span>
-        <button type="button" class="btn btn-sm btn-dark" @click="testing()">Update chart</button>
     </form>
     <div class="container">
       <div id="incomeStatementTable"></div> <!-- Tabulator to inject here -->
@@ -31,7 +30,7 @@
         apiUrlBase: "/api/income_statements",
         incomeStatementTable: null,
         incomeStatements: [],
-        startingQuarterSelect: 'Q3',
+        startingQuarterSelect: 3,
         startingYearSelect: 2020,
         timePeriod: 'QOQ'
       },
@@ -43,6 +42,15 @@
       //     this.incomeStatementTable.replaceData(incomeStatements)
       //   }
       // },
+      watch: {
+        // It might seem silly to have watchers for these, but I think it's necessary. For the radio buttons, I don't know
+        // of another way, and for the <select>s, it works better than using the "onchange" attribute.
+        startingQuarterSelect: function(newValue, oldValue) { this.updateTableData() },
+        startingYearSelect: function(newValue, oldValue) { this.updateTableData() },
+        timePeriod: function(newType, oldType) {
+          this.updateTableData() // update the table automatically when someone changes between QOQ vs YOY analysis
+        }
+      },
       methods: {
         loadData: async function () {
           // not using query strings here but will do that for AJAX requests
@@ -58,8 +66,18 @@
             })))
           })
         },
-        testing: function() {
-          console.log(`You have selected a ${this.timePeriod} analysis for ${this.startingQuarterSelect} ${this.startingYearSelect}`)
+        updateTableData: async function () {
+          const apiEndpoint = `${this.apiUrlBase}?starting_year=${this.startingYearSelect}&starting_quarter=${this.startingQuarterSelect}&analysis_type=${this.timePeriod}`;
+          console.log(apiEndpoint)
+
+          this.incomeStatements = (await axios.get(apiEndpoint)).data
+          this.incomeStatementTable.replaceData(this.incomeStatements.line_items)
+          
+          const columnsWithTitles = this.incomeStatementTable.getColumns().slice(1)
+          columnsWithTitles.forEach((column, i) => column.updateDefinition({title: this.incomeStatements.dates[i]}))
+
+          // This is still a little of a work in progress, mostly with having some quarters with no data... but it works!
+          console.log(this.incomeStatements)
         }
       },
       mounted: async function () {
