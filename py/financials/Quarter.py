@@ -16,6 +16,11 @@ class Quarter(Enum):
 
     @property
     def previous_three_quarters(self) -> List['Quarter']:
+        """
+        This method looks kind of nice, but is unused. Is it needed?
+        After all, the "previous quarters" bit really is only useful in the context of particular years...
+        e.g. to tell the computer Q1 follows Q4 is really only helpful when saying after Q1 2020 comes Q4 2019.
+        """
         previous_quarters_mapping = {
             Quarter.Q4: [Quarter.Q3, Quarter.Q2, Quarter.Q1],
             Quarter.Q3: [Quarter.Q2, Quarter.Q1, Quarter.Q4],

@@ -3,9 +3,7 @@ from jsonpickle import encode
 
 from py.financials.Quarter import Quarter
 from py.financials.balance_sheet.BalanceSheetFactory import balance_sheet
-from py.financials.income_statement.IncomeStatement import IncomeStatement
 from py.financials.income_statement.IncomeStatementCategory import income_statement_categories
-from py.scripting.FinancialActivities import get_financial_activities
 from py.scripting.IncomeStatementFactory import IncomeStatementFactory
 from py.view_models.IncomeStatementsViewModel import IncomeStatementsViewModel
 
@@ -14,26 +12,23 @@ app = Flask(__name__)
 """
 A general app note - I think we only want the financial activities to be stored in the database.
 On the back-end, Python can create the income statement(s) in-memory and expose them at a particular API endpoint.
-Vue can take over from there and Tabulator can probably create the calculated columns.
+Vue and Tabulator can take over as far as the display goes.
+
+I will probably stick with Python to calculate all row values, since very little data is going to be passed to the
+  front-end, no matter how many activities are added/processed server-side.  
 """
 
 @app.route('/api/income_statements')
 def generate_income_statements():
     starting_year = request.args.get('starting_year', default=2020, type=int)
-    starting_quarter_number = request.args.get('starting_quarter', default=3, type=int)
-    analysis_type = request.args.get('analysis_type', default='QOQ', type=str) # TODO actually implement this
+    starting_quarter_number = request.args.get('starting_quarter', default=None, type=int)
 
-    starting_quarter = next(q for q in Quarter if q.number == starting_quarter_number)
-    
-    # this will need some work but we'll get there... should Quarters include the year? I am starting to think so.
-    previous_three_quarters = starting_quarter.previous_three_quarters
+    starting_quarter = next((q for q in Quarter if q.number == starting_quarter_number), None)
 
-    income_statements = [
-        IncomeStatement(get_financial_activities(starting_year, quarter)) 
-        for quarter in [starting_quarter] + previous_three_quarters[0:2]
-        # the indexing is necessary because Q4 2020 doesn't have any financial activities in it.
-        # but this is just for testing, anyway.
-    ]
+    if starting_quarter:
+        income_statements = IncomeStatementFactory.generate_QOQ_statements(starting_year, starting_quarter)
+    else:
+        income_statements = IncomeStatementFactory.generate_YOY_statements(starting_year)
 
     income_statement_view_model = IncomeStatementsViewModel(income_statements)
 

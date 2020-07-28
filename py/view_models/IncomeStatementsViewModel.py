@@ -6,17 +6,10 @@ from py.financials.income_statement.IncomeStatement import IncomeStatement
 
 class IncomeStatementsViewModel:
     def __init__(self, income_statements: List[IncomeStatement]):
-        self.dates = [IncomeStatementsViewModel._get_date_ui_from(statement) for statement in income_statements]
+        self.dates = [statement.date_ui for statement in income_statements]
         self.line_items = [IncomeStatementLineItem(field, income_statements) for field in [
             cat.attribute for cat in income_statement_categories
         ]]
-
-    @staticmethod
-    def _get_date_ui_from(statement: IncomeStatement) -> str:
-        if not statement.quarter:
-            return str(statement.year)
-
-        return f"{statement.quarter.name} {statement.year}"
 
 
 class IncomeStatementLineItem:

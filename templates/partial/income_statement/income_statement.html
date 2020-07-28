@@ -1,20 +1,24 @@
 <h3>Income statement</h3>
 
 <div id="incomeStatementRoot">
-    <form class="mb-3">
-        <label for="startingYearSelect">Select starting year and quarter: </label>
+    <form class="container mb-3">
+      <div class="row justify-content-center mb-1">
+        <label for="startingYearSelect" class="mr-1 mb-0">Start at: </label>
         <select id="startingYearSelect" v-model="startingYearSelect">
             <option v-for="year in [2020, 2019]">[[ year ]]</option>
         </select>
-        <select id="startingQuarterSelect" v-model="startingQuarterSelect">
+        <select id="startingQuarterSelect" v-model="startingQuarterSelect" v-show="timePeriod === 'QOQ'">
             <option v-for="quarter in [4, 3, 2, 1]" :value="quarter">Q[[ quarter ]]</option>
         </select>
+      </div>
+      <div class="row justify-content-center">
         <span class="ml-2">
             <div class="form-check-inline" v-for="timePeriodType in ['QOQ', 'YOY']">
                 <input class="form-check-input" type="radio" :id="'radio' + timePeriodType" :value="timePeriodType" v-model="timePeriod">
                 <label class="form-check-label" :for="'radio' + timePeriodType">Show [[ timePeriodType ]]</label>
             </div>
         </span>
+      </div>
     </form>
     <div class="container">
       <div id="incomeStatementTable"></div> <!-- Tabulator to inject here -->
@@ -23,6 +27,7 @@
 
 
 <script>
+    // Todo would love to get the operating expenses be something that I could minimize/maximize... that'll be another day.
     const incomeStatement = new Vue({
       el: "#incomeStatementRoot",
       delimiters: ['[[', ']]'],  // the default is curly braces, but this would conflict with Jinja syntax
@@ -31,46 +36,50 @@
         incomeStatementTable: null,
         incomeStatements: [],
         startingQuarterSelect: 3,
+        startingQuarterSelectPrevious: 3,
         startingYearSelect: 2020,
         timePeriod: 'QOQ'
       },
-      // the following was copy-pasted from Tabulator's website on the Vue page - I don't think we'll need it
-      // but I'm leaving it here for now. I think more likely there will be AJAX GET requests and the table
-      // will update accordingly at that time.
-      // watch: {
-      //   incomeStatements: function(newData) { 
-      //     this.incomeStatementTable.replaceData(incomeStatements)
-      //   }
-      // },
+      computed: {
+        apiUrl: function () {
+          return `${this.apiUrlBase}?starting_year=${this.startingYearSelect}&starting_quarter=${this.startingQuarterSelect}`
+        }
+      },
       watch: {
         // It might seem silly to have watchers for these, but I think it's necessary. For the radio buttons, I don't know
         // of another way, and for the <select>s, it works better than using the "onchange" attribute.
-        startingQuarterSelect: function(newValue, oldValue) { this.updateTableData() },
+        startingQuarterSelect: function(newValue, oldValue) {
+          this.updateTableData()
+          this.startingQuarterSelectPrevious = oldValue // store this value in case a user switches to YOY analysis
+        },
         startingYearSelect: function(newValue, oldValue) { this.updateTableData() },
         timePeriod: function(newType, oldType) {
+          // Either restore the starting quarter to what it was before, or reset it (if switching to YOY)
+          this.startingQuarterSelect = newType === 'YOY'
+            ? null
+            : this.startingQuarterSelectPrevious
+
           this.updateTableData() // update the table automatically when someone changes between QOQ vs YOY analysis
         }
       },
       methods: {
         loadData: async function () {
-          // not using query strings here but will do that for AJAX requests
-          this.incomeStatements = (await axios.get(this.apiUrlBase)).data
+          this.incomeStatements = (await axios.get(this.apiUrl)).data
         },
         setupTabulatorTable: function () {
           this.incomeStatementTable = new Tabulator("#incomeStatementTable", {
             data: this.incomeStatements.line_items,
             columns: [
-              { title: "", field: "field" },
+              { title: "", field: "field", headerSort: false },
             ].concat(this.incomeStatements.dates.map((date, index) => ({
-              title: date, field: `value${index}`
+              title: date, field: `value${index}`, headerSort: false, minWidth: 80
             })))
           })
         },
         updateTableData: async function () {
-          const apiEndpoint = `${this.apiUrlBase}?starting_year=${this.startingYearSelect}&starting_quarter=${this.startingQuarterSelect}&analysis_type=${this.timePeriod}`;
-          console.log(apiEndpoint)
+          console.log(this.apiUrl)
 
-          this.incomeStatements = (await axios.get(apiEndpoint)).data
+          await this.loadData()
           this.incomeStatementTable.replaceData(this.incomeStatements.line_items)
           
           const columnsWithTitles = this.incomeStatementTable.getColumns().slice(1)
