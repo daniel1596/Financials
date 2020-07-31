@@ -27,7 +27,6 @@
 
 
 <script>
-    // Todo would love to get the operating expenses be something that I could minimize/maximize... that'll be another day.
     const incomeStatement = new Vue({
       el: "#incomeStatementRoot",
       delimiters: ['[[', ']]'],  // the default is curly braces, but this would conflict with Jinja syntax
@@ -69,6 +68,7 @@
         setupTabulatorTable: function () {
           this.incomeStatementTable = new Tabulator("#incomeStatementTable", {
             data: this.incomeStatements.line_items,
+            dataTree: true, // needed for nested table data - see http://tabulator.info/docs/4.7/tree
             columns: [
               { title: "", field: "field", headerSort: false },
             ].concat(this.incomeStatements.dates.map((date, index) => ({
