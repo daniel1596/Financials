@@ -54,7 +54,7 @@
             ? null
             : this.startingQuarterSelectPrevious
 
-          this.updateTableData() // update the table automatically when someone changes between QOQ vs YOY analysis
+          this.updateTableData()
         },
         startingQuarterSelect: function(newValue, oldValue) {
           this.updateTableData()
@@ -66,6 +66,9 @@
       },
       methods: {
         loadData: async function () {
+          // In theory, I could add error handling here, checking if the data is [] or false-y
+          // However, with such a small app and very limited opportunities for failure, I'm not worrying too much
+          // about it right now. Can add later if desired or if errors occur.
           this.incomeStatements = (await axios.get(this.apiUrl)).data
         },
         setupTabulatorTable: function () {
@@ -80,16 +83,12 @@
           })
         },
         updateTableData: async function () {
-          console.log(this.apiUrl)
-
           await this.loadData()
+
           this.incomeStatementTable.replaceData(this.incomeStatements.line_items)
           
           const columnsWithTitles = this.incomeStatementTable.getColumns().slice(1)
           columnsWithTitles.forEach((column, i) => column.updateDefinition({title: this.incomeStatements.dates[i]}))
-
-          // This is still a little of a work in progress, mostly with having some quarters with no data... but it works!
-          console.log(this.incomeStatements)
         }
       },
       mounted: async function () {
