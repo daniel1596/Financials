@@ -15,7 +15,16 @@ class IncomeStatementFactory:
         return [IncomeStatement.generate(yq.year, yq.quarter) for yq in years_and_quarters_sorted]
 
     @staticmethod
-    def generate_YOY_statements(starting_year: int):
+    def generate_YOY_statements(starting_year: int, starting_quarter: Quarter):
+        return [
+            IncomeStatement.generate(starting_year, starting_quarter),
+            IncomeStatement.generate(starting_year - 1, starting_quarter),
+            IncomeStatement.generate(starting_year - 2, starting_quarter),
+            IncomeStatement.generate(starting_year - 3, starting_quarter)
+        ]
+
+    @staticmethod
+    def generate_yearly_statements(starting_year: int):
         return [
             IncomeStatement.generate(starting_year),
             IncomeStatement.generate(starting_year - 1),

@@ -7,15 +7,15 @@
         <select id="startingYearSelect" v-model="startingYearSelect">
             <option v-for="year in [2020, 2019]">[[ year ]]</option>
         </select>
-        <select id="startingQuarterSelect" v-model="startingQuarterSelect" v-show="timePeriod === 'QOQ'">
+        <select id="startingQuarterSelect" v-model="startingQuarterSelect" v-show="analysisTypeChosen !== 'Yearly'">
             <option v-for="quarter in [4, 3, 2, 1]" :value="quarter">Q[[ quarter ]]</option>
         </select>
       </div>
       <div class="row justify-content-center">
         <span class="ml-2">
-            <div class="form-check-inline" v-for="timePeriodType in ['QOQ', 'YOY']">
-                <input class="form-check-input" type="radio" :id="'radio' + timePeriodType" :value="timePeriodType" v-model="timePeriod">
-                <label class="form-check-label" :for="'radio' + timePeriodType">Show [[ timePeriodType ]]</label>
+            <div class="form-check-inline" v-for="analysisType in analysisTypes">
+                <input class="form-check-input" type="radio" :id="'radio' + analysisType" :value="analysisType" v-model="analysisTypeChosen">
+                <label class="form-check-label" :for="'radio' + analysisType">Show [[ analysisType ]]</label>
             </div>
         </span>
       </div>
@@ -35,31 +35,34 @@
         incomeStatementTable: null,
         incomeStatements: [],
         startingQuarterSelect: 3,
-        startingQuarterSelectPrevious: 3,
+        startingQuarterSelectPrevious: 3, // storing the previous non-null value for when startingQuarterSelect goes null.
         startingYearSelect: 2020,
-        timePeriod: 'QOQ' // TODO - need to differentiate between "yearly" and YOY analysis
+        analysisTypeChosen: 'QOQ',
+        analysisTypes: ['QOQ', 'YOY', 'Yearly']
       },
       computed: {
         apiUrl: function () {
-          return `${this.apiUrlBase}?starting_year=${this.startingYearSelect}&starting_quarter=${this.startingQuarterSelect}`
+          return `${this.apiUrlBase}?starting_year=${this.startingYearSelect}&starting_quarter=${this.startingQuarterSelect}&analysisType=${this.analysisTypeChosen}`
         }
       },
       watch: {
         // It might seem silly to have watchers for these, but I think it's necessary. For the radio buttons, I don't know
         // of another way, and for the <select>s, it works better than using the "onchange" attribute.
-        startingQuarterSelect: function(newValue, oldValue) {
-          this.updateTableData()
-          this.startingQuarterSelectPrevious = oldValue // store this value in case a user switches to YOY analysis
-        },
-        startingYearSelect: function(newValue, oldValue) { this.updateTableData() },
-        timePeriod: function(newType, oldType) {
-          // Either restore the starting quarter to what it was before, or reset it (if switching to YOY)
-          this.startingQuarterSelect = newType === 'YOY'
+        analysisTypeChosen: function(newType, oldType) {
+          // Either restore the starting quarter to what it was before, or reset it (if switching to yearly)
+          this.startingQuarterSelect = newType === 'Yearly'
             ? null
             : this.startingQuarterSelectPrevious
 
           this.updateTableData() // update the table automatically when someone changes between QOQ vs YOY analysis
-        }
+        },
+        startingQuarterSelect: function(newValue, oldValue) {
+          this.updateTableData()
+
+          if (oldValue)
+            this.startingQuarterSelectPrevious = oldValue
+        },
+        startingYearSelect: function(newValue, oldValue) { this.updateTableData() }
       },
       methods: {
         loadData: async function () {

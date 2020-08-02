@@ -22,13 +22,18 @@ I will probably stick with Python to calculate all row values, since very little
 def generate_income_statements():
     starting_year = request.args.get('starting_year', default=2020, type=int)
     starting_quarter_number = request.args.get('starting_quarter', default=None, type=int)
+    analysis_type = request.args.get('analysisType', default=None, type=str)
 
     starting_quarter = next((q for q in Quarter if q.number == starting_quarter_number), None)
 
-    if starting_quarter:
+    if analysis_type == 'QOQ' and starting_quarter:
         income_statements = IncomeStatementFactory.generate_QOQ_statements(starting_year, starting_quarter)
+    elif analysis_type == 'YOY' and starting_quarter:
+        income_statements = IncomeStatementFactory.generate_YOY_statements(starting_year, starting_quarter)
+    elif analysis_type == 'Yearly':
+        income_statements = IncomeStatementFactory.generate_yearly_statements(starting_year)
     else:
-        income_statements = IncomeStatementFactory.generate_YOY_statements(starting_year)
+        income_statements = [] # error situation; should not happen
 
     income_statement_view_model = IncomeStatementsViewModel(income_statements)
 
