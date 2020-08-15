@@ -4,10 +4,10 @@
     <form class="container mb-3">
       <div class="row justify-content-center mb-1">
         <label for="startingYearSelect" class="mr-1 mb-0">Start at: </label>
-        <select id="startingYearSelect" v-model="startingYearSelect">
+        <select id="startingYearSelect" v-model="selected.startingYear">
             <option v-for="year in [2020, 2019]">[[ year ]]</option>
         </select>
-        <select id="startingQuarterSelect" v-model="startingQuarterSelect" v-show="analysisTypeChosen !== 'Yearly'">
+        <select id="startingQuarterSelect" v-model="selected.startingQuarter" v-show="analysisTypeChosen !== 'Yearly'">
             <option v-for="quarter in [4, 3, 2, 1]" :value="quarter">Q[[ quarter ]]</option>
         </select>
       </div>
@@ -31,18 +31,21 @@
       el: "#incomeStatementRoot",
       delimiters: ['[[', ']]'],  // the default is curly braces, but this would conflict with Jinja syntax
       data: {
+        analysisTypeChosen: 'QOQ',
+        analysisTypes: ['QOQ', 'YOY', 'Yearly'],
         apiUrlBase: "/api/income_statements",
         incomeStatementTable: null,
         incomeStatements: [],
-        startingQuarterSelect: 3,
+        selected: {
+          startingQuarter: 3,
+          startingYear: 2020
+        },
         startingQuarterSelectPrevious: 3, // storing the previous non-null value for when startingQuarterSelect goes null.
-        startingYearSelect: 2020,
-        analysisTypeChosen: 'QOQ',
-        analysisTypes: ['QOQ', 'YOY', 'Yearly']
       },
       computed: {
         apiUrl: function () {
-          return `${this.apiUrlBase}?starting_year=${this.startingYearSelect}&starting_quarter=${this.startingQuarterSelect}&analysisType=${this.analysisTypeChosen}`
+          const { startingQuarter, startingYear } = this.selected
+          return `${this.apiUrlBase}?starting_year=${startingYear}&starting_quarter=${startingQuarter}&analysisType=${this.analysisTypeChosen}`
         }
       },
       watch: {
@@ -50,19 +53,21 @@
         // of another way, and for the <select>s, it works better than using the "onchange" attribute.
         analysisTypeChosen: function(newType, oldType) {
           // Either restore the starting quarter to what it was before, or reset it (if switching to yearly)
-          this.startingQuarterSelect = newType === 'Yearly'
+          this.selected.startingQuarter = newType === 'Yearly'
             ? null
             : this.startingQuarterSelectPrevious
 
           this.updateTableData()
         },
-        startingQuarterSelect: function(newValue, oldValue) {
-          this.updateTableData()
+        selected: {
+          handler: function(newValue, oldValue) {
+            this.updateTableData()
 
-          if (oldValue)
-            this.startingQuarterSelectPrevious = oldValue
-        },
-        startingYearSelect: function(newValue, oldValue) { this.updateTableData() }
+            if (oldValue.startingQuarter)
+              this.startingQuarterSelectPrevious = oldValue.startingQuarter
+          },
+          deep: true
+        }
       },
       methods: {
         loadData: async function () {
@@ -86,7 +91,7 @@
           await this.loadData()
 
           this.incomeStatementTable.replaceData(this.incomeStatements.line_items)
-          
+
           const columnsWithTitles = this.incomeStatementTable.getColumns().slice(1)
           columnsWithTitles.forEach((column, i) => column.updateDefinition({title: this.incomeStatements.dates[i]}))
         }

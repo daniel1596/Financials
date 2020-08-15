@@ -41,7 +41,6 @@ def generate_income_statements():
     return encode(income_statement_view_model, unpicklable=False)
 
 
-
 @app.route('/')
 def hello_world():
     return render_template('index.html', balance_sheet=balance_sheet,
