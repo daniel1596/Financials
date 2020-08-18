@@ -9,8 +9,8 @@
         <select v-model="selected.startingQuarter" v-show="selected.analysisType !== 'Yearly'">
             <option v-for="quarter in [4, 3, 2, 1]" :value="quarter">Q[[ quarter ]]</option>
         </select>
-        <div v-show="selected.analysisType !== 'QOQ'">
-          <label for="columnCount" class="ml-2 mb-0">How many columns? </label>
+        <div> <!-- This div is optional - may get rid of it later but we'll see -->
+          <label for="columnCount" class="ml-2 mb-0">Number of statements: </label>
           <select v-model="selected.columnCount">
             <option v-for="x in columnCountOptions">[[ x ]]</option>
           </select>

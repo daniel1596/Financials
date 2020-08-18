@@ -32,3 +32,12 @@ class Quarter(Enum):
 
     def includes_month(self, month: int) -> bool:
         return month in range(self.month_first, self.month_last + 1)
+
+    @classmethod
+    def descending(cls, *, start: int=None, end: int=None) -> List['Quarter']:
+        quarters_filtered = (q for q in Quarter if (not end or q.number >= end) and (not start or q.number <= start))
+        return sorted(quarters_filtered, key=lambda q: q.number, reverse=True)
+
+    @staticmethod
+    def matching_number(quarter_number: int) -> 'Quarter':
+        return next((q for q in Quarter if q.number == quarter_number), None)

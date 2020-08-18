@@ -1,4 +1,6 @@
-from typing import List
+from math import floor
+from functools import reduce
+from typing import Final, List
 
 from py.financials.SpecificQuarter import SpecificQuarter
 from py.financials.Quarter import Quarter
@@ -12,18 +14,33 @@ class IncomeStatementFactory:
     @staticmethod
     def generate_QOQ_statements(starting_year: int, starting_quarter: Quarter, column_count: int):
         """
-        For now, I am only doing 4 QOQ statements, regardless of the value of column_count.
-        Currently, the option to change the column count is hidden in the UI. But that's inconsistent and limits
-        the functionality. So one day I'd like to tackle that.
+        Generate a variable number of QOQ statements. Logic gets tricky but it works.
+        The premise is that there is an "initial/starting" year, "middle" years, and an "ending" year.
         """
 
-        # I wish there were an easier way to do this - this was a little complex but it worked out
-        last_year = starting_year - 1
+        if starting_quarter.number >= column_count:
+            # We won't have any quarters outside of the starting year, making this pretty easy
+            lowest_quarter_number = starting_quarter.number - column_count + 1
+            quarters = Quarter.descending(start=starting_quarter.number, end=lowest_quarter_number)
+            return [IncomeStatement(starting_year, q) for q in quarters]
 
-        years_and_quarters = [SpecificQuarter((last_year if q.number > starting_quarter.number else starting_year), q) for q in Quarter]
-        years_and_quarters_sorted = sorted(years_and_quarters, key=lambda yq: (yq.year, yq.quarter.number), reverse=True)
+        starting_year_statements = [IncomeStatement(starting_year, q) for q in Quarter.descending(start=starting_quarter.number)]
 
-        return [IncomeStatement(yq.year, yq.quarter) for yq in years_and_quarters_sorted]
+        statements_remaining = column_count - starting_quarter.number
+        quarters_in_year: Final = 4
+        year_count_four_statements = floor(statements_remaining / quarters_in_year)
+        statement_count_oldest_year = statements_remaining % quarters_in_year
+
+        final_year = starting_year - year_count_four_statements - 1
+
+        middle_statements = [] if not year_count_four_statements else list(reduce(list.__add__, (
+            [IncomeStatement(y, q)] for y in range(starting_year - 1, final_year, -1) for q in Quarter.descending()
+        )))
+
+        last_statement_quarter = 4 - statement_count_oldest_year + 1  # e.g. if 1 statement final year, this is 4 - 1 + 1
+        last_year_statements = [IncomeStatement(final_year, q) for q in Quarter.descending(end=last_statement_quarter)]
+
+        return starting_year_statements + middle_statements + last_year_statements
 
     @staticmethod
     def generate_YOY_statements(starting_year: int, starting_quarter: Quarter, column_count: int):
