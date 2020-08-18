@@ -7,14 +7,20 @@
         <select id="startingYearSelect" v-model="selected.startingYear">
             <option v-for="year in [2020, 2019]">[[ year ]]</option>
         </select>
-        <select id="startingQuarterSelect" v-model="selected.startingQuarter" v-show="analysisTypeChosen !== 'Yearly'">
+        <select v-model="selected.startingQuarter" v-show="selected.analysisType !== 'Yearly'">
             <option v-for="quarter in [4, 3, 2, 1]" :value="quarter">Q[[ quarter ]]</option>
         </select>
+        <div v-show="selected.analysisType !== 'QOQ'">
+          <label for="columnCount" class="ml-2 mb-0">How many columns? </label>
+          <select v-model="selected.columnCount">
+            <option v-for="x in columnCountOptions">[[ x ]]</option>
+          </select>
+        </div>
       </div>
       <div class="row justify-content-center">
         <span class="ml-2">
             <div class="form-check-inline" v-for="analysisType in analysisTypes">
-                <input class="form-check-input" type="radio" :id="'radio' + analysisType" :value="analysisType" v-model="analysisTypeChosen">
+                <input class="form-check-input" type="radio" :id="'radio' + analysisType" :value="analysisType" v-model="selected.analysisType">
                 <label class="form-check-label" :for="'radio' + analysisType">Show [[ analysisType ]]</label>
             </div>
         </span>
@@ -31,40 +37,32 @@
       el: "#incomeStatementRoot",
       delimiters: ['[[', ']]'],  // the default is curly braces, but this would conflict with Jinja syntax
       data: {
-        analysisTypeChosen: 'QOQ',
         analysisTypes: ['QOQ', 'YOY', 'Yearly'],
         apiUrlBase: "/api/income_statements",
+        columnCountOptions: Array(20).fill().map((_,i) => i + 1), // 20 is an arbitrary max, but should be sufficient
         incomeStatementTable: null,
         incomeStatements: [],
         selected: {
+          analysisType: 'YOY',
+          columnCount: 4,
           startingQuarter: 3,
           startingYear: 2020
-        },
-        startingQuarterSelectPrevious: 3, // storing the previous non-null value for when startingQuarterSelect goes null.
+        }
       },
       computed: {
         apiUrl: function () {
-          const { startingQuarter, startingYear } = this.selected
-          return `${this.apiUrlBase}?starting_year=${startingYear}&starting_quarter=${startingQuarter}&analysisType=${this.analysisTypeChosen}`
+          const { analysisType, columnCount, startingQuarter, startingYear } = this.selected
+          return `${this.apiUrlBase}?starting_year=${startingYear}&starting_quarter=${startingQuarter}&analysisType=${analysisType}&columnCount=${columnCount}`
         }
       },
       watch: {
-        // It might seem silly to have watchers for these, but I think it's necessary. For the radio buttons, I don't know
-        // of another way, and for the <select>s, it works better than using the "onchange" attribute.
-        analysisTypeChosen: function(newType, oldType) {
-          // Either restore the starting quarter to what it was before, or reset it (if switching to yearly)
-          this.selected.startingQuarter = newType === 'Yearly'
-            ? null
-            : this.startingQuarterSelectPrevious
-
-          this.updateTableData()
-        },
+        // There might be a slightly better way, but I think this watcher is all right. It's much better than it was.
+        // We do need it to be deep to update whenever any of the properties (e.g. selected.analysisType) change.
+        // And it's a better solution than using an "onchange" attribute for each dropdown/radio button
+        // (which was the original attempt at a solution, and didn't work).
         selected: {
           handler: function(newValue, oldValue) {
             this.updateTableData()
-
-            if (oldValue.startingQuarter)
-              this.startingQuarterSelectPrevious = oldValue.startingQuarter
           },
           deep: true
         }
@@ -88,17 +86,18 @@
           })
         },
         updateTableData: async function () {
+          // It seems like slightly poor form to re-instantiate the Tabulator object each time through,
+          // but I'm not sure that it can be avoided. It may be unnecessary work to avoid it.
+          // I tried using table.redraw() and table.redraw(true) as well, but I think this or something similar
+          // is necessary to actually change the table columns and re-render everything.
+          // However, since the amount of JSON data is so small, the JS object is so small,
+          // and most importantly, the performance hit seems very minimal, I am inclined to leave it for now.
           await this.loadData()
-
-          this.incomeStatementTable.replaceData(this.incomeStatements.line_items)
-
-          const columnsWithTitles = this.incomeStatementTable.getColumns().slice(1)
-          columnsWithTitles.forEach((column, i) => column.updateDefinition({title: this.incomeStatements.dates[i]}))
+          this.setupTabulatorTable()
         }
       },
       mounted: async function () {
-        await this.loadData()
-        this.setupTabulatorTable()
+        await this.updateTableData()
       }
     })
 </script>

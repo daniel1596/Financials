@@ -8,14 +8,15 @@ from py.scripting.FinancialActivities import get_financial_activities
 
 
 class IncomeStatement:
-    def __init__(self, activities: List[FinancialActivity], year: int, quarter: Optional[Quarter] = None):
+    def __init__(self, year: int, quarter: Optional[Quarter] = None):
         """
-        Create an income statement from a pre-filtered list of financial activities.
-        Not sure if this method is needed in addition to the .generate() static method below it, but I am guessing so?
-        Can refactor later as desired.
+        Updated: removed IncomeStatement.generate() as it was not needed to have that method plus this __init__().
+        Also, setting the attributes (e.g. self.year = year) should stay in __init__().
         """
         self.year = year
         self.quarter = quarter
+
+        activities = get_financial_activities(year, quarter)
         self.operating_revenue = self._sum_amount_by_category(activities, RevenueCategory.OPERATING)
         self.operating_expenses = self._sum_amount_by_category(activities, ExpenseCategory.OPERATING)
         self.operating_income = self.operating_revenue - self.operating_expenses
@@ -33,11 +34,6 @@ class IncomeStatement:
             return str(self.year)
 
         return f"{self.quarter.name} {self.year}"
-
-    @staticmethod
-    def generate(year: int, quarter: Optional[Quarter] = None) -> 'IncomeStatement':
-        activities = get_financial_activities(year, quarter)
-        return IncomeStatement(activities, year, quarter)
 
     def _sum_amount_by_category(self, activities: List[FinancialActivity], category: IncomeStatementCategory):
         return sum(act.amount for act in activities if act.income_statement_category == category)
