@@ -1,7 +1,12 @@
-# Retreived from https://github.com/github/gitignore/blob/master/Python.gitignore
-
-# Daniel adding some more here
+# Daniel's additions - not sure why .idea wasn't on there.
+# The database file will need to exist, but it does not need to be in version control.
+# However, this will mean regular backups must exist. Hmm.
+# Also I could theoretically limit myself to working on this project on 1 computer.
+# Probably worth it, though. I can use a USB drive if I need to.
 .idea/
+db/financials.sqlite
+
+# Retreived from https://github.com/github/gitignore/blob/master/Python.gitignore
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -141,3 +146,4 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
