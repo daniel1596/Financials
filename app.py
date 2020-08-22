@@ -1,51 +1,20 @@
-from flask import Flask, render_template, request
-from jsonpickle import encode
+from flask import Flask
 
-from py.financials.Quarter import Quarter
-from py.financials.balance_sheet.BalanceSheetFactory import balance_sheet
-from py.financials.income_statement.IncomeStatementCategory import income_statement_categories
-from py.scripting.IncomeStatementFactory import IncomeStatementFactory
-from py.view_models.IncomeStatementsViewModel import IncomeStatementsViewModel
+from py.blueprints.Api import api
+from py.blueprints.Pages import pages
 
 app = Flask(__name__)
+app.register_blueprint(api)
+app.register_blueprint(pages)
 
-"""
-A general app note - I think we only want the financial activities to be stored in the database.
-On the back-end, Python can create the income statement(s) in-memory and expose them at a particular API endpoint.
-Vue and Tabulator can take over as far as the display goes.
-
-I will probably stick with Python to calculate all row values, since very little data is going to be passed to the
-  front-end, no matter how many activities are added/processed server-side.  
-"""
-
-@app.route('/api/income_statements')
-def generate_income_statements():
-    starting_year = request.args.get('starting_year', default=2020, type=int)
-    starting_quarter_number = request.args.get('starting_quarter', default=None, type=int)
-    analysis_type = request.args.get('analysisType', default=None, type=str)
-    column_count = request.args.get('columnCount', default=4, type=int)
-
-    starting_quarter = next((q for q in Quarter if q.number == starting_quarter_number), None)
-
-    if analysis_type == 'QOQ' and starting_quarter:
-        income_statements = IncomeStatementFactory.generate_QOQ_statements(starting_year, starting_quarter, column_count)
-    elif analysis_type == 'YOY' and starting_quarter:
-        income_statements = IncomeStatementFactory.generate_YOY_statements(starting_year, starting_quarter, column_count)
-    elif analysis_type == 'Yearly':
-        income_statements = IncomeStatementFactory.generate_yearly_statements(starting_year, column_count)
-    else:
-        income_statements = [] # error situation; should not happen
-
-    income_statement_view_model = IncomeStatementsViewModel(income_statements)
-
-    # in encode(), "unpicklable" set to False removes "py/object" fields
-    return encode(income_statement_view_model, unpicklable=False)
-
-
-@app.route('/')
-def hello_world():
-    return render_template('index.html', balance_sheet=balance_sheet,
-                           income_statement_categories=income_statement_categories)
+# Next objectives:
+# TODO: get the app to read from the database rather than an in-memory list
+# The view-model might remain similar but the Python class hierarchy is probably going to basically disappear.
+# As is probably at least one Enum. But that's ok. I'll be trimming back on the fat of this application,
+# and what will be left will be a working application that's well-built from the database layer up.
+# Also will be scriptable, secure, etc.
+# Really happy about how this is coming together so far. Feels like my previous work on similar apps
+# is paying off as I can figure out on this app. Tabulator, Vue, Sqlite3, Flask, SQL, Bootstrap. Living the dream.
 
 
 if __name__ == '__main__':
