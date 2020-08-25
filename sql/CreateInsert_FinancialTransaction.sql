@@ -10,6 +10,7 @@ CREATE TABLE FinancialTransaction (
   -- on traditional income statements or balance sheets.
 );
 
--- test data
--- INSERT INTO FinancialTransaction (FinancialTransactionTypeID, Amount)
--- VALUES ((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Groceries'), 6.5)
+-- test data - this won't stay here forever, but is helpful for now.
+-- eventually all the data will be done through importing I presume.
+INSERT INTO FinancialTransaction (FinancialTransactionTypeID, Amount)
+VALUES ((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Groceries'), 6.5)

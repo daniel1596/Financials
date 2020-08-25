@@ -2,6 +2,7 @@ from flask import request
 
 from . import *
 from .response.CustomResponse import CustomResponse
+from ..database.DatabaseMethods import get_financial_transactions
 from ..financials.Quarter import Quarter
 from ..scripting.IncomeStatementFactory import IncomeStatementFactory
 from ..view_models.IncomeStatementsViewModel import IncomeStatementsViewModel
@@ -31,6 +32,14 @@ def generate_income_statements():
 
     # in encode(), "unpicklable" set to False removes "py/object" fields
     return encode(income_statement_view_model, unpicklable=False)
+
+
+@api.route('/transactions/list')
+def list_all_transactions():
+    all_transactions = get_financial_transactions()
+
+    return encode(all_transactions, unpicklable=False)
+
 
 @api.route('/transactions/upload/excel/check', methods=['POST'])
 def check_upload():

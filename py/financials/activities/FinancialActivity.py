@@ -5,11 +5,18 @@ from py.financials.income_statement.IncomeStatementCategory import IncomeStateme
 
 
 class FinancialActivity:
-    """Base class (I think) for transactions, capital gains (realized), expenses, etc."""
+    """Base class for transactions, capital gains (realized), expenses, etc."""
     def __init__(self, amount: float, date_: date, income_statement_category: IncomeStatementCategory):
         self.amount = amount
         self.date = date_
         self.income_statement_category = income_statement_category
+        
+        # I think I may follow more of a pattern like this - this is just for testing currently,
+        # but eventually I'd love to do more things like this
+        self.ui = {
+            "amount": "{:,.2f}".format(abs(amount)),
+            "income_statement_category": self.income_statement_category.name
+        }
 
 
 class AssetTransfer(FinancialActivity):
