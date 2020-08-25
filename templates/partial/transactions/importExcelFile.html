@@ -5,7 +5,7 @@
     <!-- I tried using Bootstrap's custom file input code, and it worked on their website, but not on this one,
      even when I copy-pasted the code directly from their site.
       Also, the "browse" button (while looking cool) only comes ::after the name of the file. -->
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between mb-2">
         <div>
             <label for="importExcel" class="d-none mr-2">Upload:</label>
             <input type="file" id="importExcel" accept=".xls, .xlsx" onchange="hideImportUploadCheck()" />
@@ -13,7 +13,7 @@
         <button type="button" class="btn btn-dark" onclick="checkFile()">Check file</button>
     </div>
     <div>
-        <p></p> <!-- might do more styling here later - let's get functionality working first -->
+        <p class="alert" role="alert"></p>
         <button type="button" id="importUpload" class="btn btn-primary d-none" onclick="importFile()">
             Upload
         </button>
@@ -22,7 +22,9 @@
 
 <script>
     let file;
+    const elAlert = document.querySelector(".alert")
     const importUploadButton = document.querySelector("#importUpload")
+    const importUploadAlert = importUploadButton.previousElementSibling
 
     function checkFile() {
       file = document.querySelector("#importExcel").files[0]
@@ -30,7 +32,7 @@
       let formData = new FormData()
       formData.append("checkExcelFile", file)
 
-      axios.post('/api/transactions/checkUpload', formData)
+      axios.post('/api/transactions/upload/excel/check', formData)
         .then(response => updateFileUploadStatus(response))
     }
 
@@ -38,20 +40,25 @@
       let formData = new FormData()
       formData.append("importExcelFile", file)
 
-        axios.post('/api/transactions/upload', formData)
+        axios.post('/api/transactions/upload/excel/import', formData)
             .then(response => alert(response.data.message))
         // not sure what I'll long-term do here in .then() but this works for now.
     }
 
     function updateFileUploadStatus(response) {
       importUploadButton.parentElement.classList.remove("d-none")
-      importUploadButton.previousElementSibling.textContent = response.data.message
+      importUploadAlert.textContent = response.data.message
 
       if (response.data.is_successful) {
         importUploadButton.classList.remove("d-none")
+        elAlert.classList.remove("alert-danger")
+        elAlert.classList.add("alert-success")
       }
-      else
+      else {
         importUploadButton.classList.add("d-none")
+        elAlert.classList.add("alert-danger")
+        elAlert.classList.remove("alert-success")
+      }
     }
 
     function hideImportUploadCheck() {

@@ -32,27 +32,31 @@ def generate_income_statements():
     # in encode(), "unpicklable" set to False removes "py/object" fields
     return encode(income_statement_view_model, unpicklable=False)
 
-@api.route('/transactions/checkUpload', methods=['POST'])
+@api.route('/transactions/upload/excel/check', methods=['POST'])
 def check_upload():
+    if not len(request.files):
+        return CustomResponse.error('Please use the "browse" button to upload an Excel file first.')
+
     files_key = 'checkExcelFile'
     if files_key not in request.files:
-        return CustomResponse.error('A programming error occurred.')
+        return CustomResponse.error('Could not find the Excel file for processing.')
 
-    file = request.files[files_key]
+    excel_file = request.files[files_key]
 
-    file_extension = file.filename.split('.')[-1]
+    file_extension = excel_file.filename.split('.')[-1]
     if not file_extension.startswith('xls'):
-        return CustomResponse.error('Did not work out')
+        return CustomResponse.error('You must upload either a .xls or .xlsx file.')
 
     # Perform the actual file import here - probably calling a helper function.
 
     return CustomResponse.success('File format looks great.')
 
 
-@api.route('/transactions/upload', methods=['POST'])
+@api.route('/transactions/upload/excel/import', methods=['POST'])
 def upload_transactions():
     files_key = 'importExcelFile'
     if files_key not in request.files:
-        return CustomResponse.error('A programming error occurred.')
+        return CustomResponse.error('Could not find the Excel file for processing.')
 
-    return CustomResponse.success('It worked. View the table to see your transactions.')
+    return CustomResponse.success('The file would have imported if we were actually doing that yet haha. '
+        'View the table to see your transactions.')
