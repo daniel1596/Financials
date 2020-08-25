@@ -3,18 +3,18 @@
 <!-- May switch to pills at some point - https://getbootstrap.com/docs/4.5/components/navs/#pills -->
   <div class="nav nav-tabs justify-content-center mb-3" id="nav-tab" role="tablist">
     <a class="nav-link active" id="importTransactionsExcel-tab" data-toggle="tab" href="#importTransactionsExcel" role="tab" aria-controls="importTransactionsExcel" aria-selected="true">
-        Import an Excel file
+        Import Excel file
     </a>
     <a class="nav-link" id="transactionsTable-tab" data-toggle="tab" href="#transactionsTable" role="tab" aria-controls="transactionsTable" aria-selected="false">
-        Manage transactions
+        Transaction table
     </a>
   </div>
 </div>
 <div class="tab-content">
   <div class="tab-pane fade show active" id="importTransactionsExcel" role="tabpanel" aria-labelledby="importTransactionsExcel-tab">
-      <p>Excel import wizard</p>
+      {% include 'partial/transactions/importExcelFile.html' %}
   </div>
   <div class="tab-pane fade" id="transactionsTable" role="tabpanel" aria-labelledby="transactionsTable-tab">
-      <p>table of transactions</p>
+      {% include 'partial/transactions/transactionsTable.html' %}
   </div>
 </div>

@@ -1,6 +1,7 @@
 from flask import request
 
 from . import *
+from .response.CustomResponse import CustomResponse
 from ..financials.Quarter import Quarter
 from ..scripting.IncomeStatementFactory import IncomeStatementFactory
 from ..view_models.IncomeStatementsViewModel import IncomeStatementsViewModel
@@ -30,3 +31,28 @@ def generate_income_statements():
 
     # in encode(), "unpicklable" set to False removes "py/object" fields
     return encode(income_statement_view_model, unpicklable=False)
+
+@api.route('/transactions/checkUpload', methods=['POST'])
+def check_upload():
+    files_key = 'checkExcelFile'
+    if files_key not in request.files:
+        return CustomResponse.error('A programming error occurred.')
+
+    file = request.files[files_key]
+
+    file_extension = file.filename.split('.')[-1]
+    if not file_extension.startswith('xls'):
+        return CustomResponse.error('Did not work out')
+
+    # Perform the actual file import here - probably calling a helper function.
+
+    return CustomResponse.success('File format looks great.')
+
+
+@api.route('/transactions/upload', methods=['POST'])
+def upload_transactions():
+    files_key = 'importExcelFile'
+    if files_key not in request.files:
+        return CustomResponse.error('A programming error occurred.')
+
+    return CustomResponse.success('It worked. View the table to see your transactions.')

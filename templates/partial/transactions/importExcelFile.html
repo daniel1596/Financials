@@ -1,0 +1,60 @@
+<div id="test" class="d-inline-flex flex-column">
+    <p class="mb-1">Upload an Excel file here to import your transactions.</p>
+    <p>Please make sure the headers look like the following:</p>
+    <img src="https://via.placeholder.com/600x200" alt="Excel header template" class="mb-3" />
+    <!-- I tried using Bootstrap's custom file input code, and it worked on their website, but not on this one,
+     even when I copy-pasted the code directly from their site.
+      Also, the "browse" button (while looking cool) only comes ::after the name of the file. -->
+    <div class="d-flex justify-content-between">
+        <div>
+            <label for="importExcel" class="d-none mr-2">Upload:</label>
+            <input type="file" id="importExcel" accept=".xls, .xlsx" onchange="hideImportUploadCheck()" />
+        </div>
+        <button type="button" class="btn btn-dark" onclick="checkFile()">Check file</button>
+    </div>
+    <div>
+        <p></p> <!-- might do more styling here later - let's get functionality working first -->
+        <button type="button" id="importUpload" class="btn btn-primary d-none" onclick="importFile()">
+            Upload
+        </button>
+    </div>
+</div>
+
+<script>
+    let file;
+    const importUploadButton = document.querySelector("#importUpload")
+
+    function checkFile() {
+      file = document.querySelector("#importExcel").files[0]
+
+      let formData = new FormData()
+      formData.append("checkExcelFile", file)
+
+      axios.post('/api/transactions/checkUpload', formData)
+        .then(response => updateFileUploadStatus(response))
+    }
+
+    function importFile() {
+      let formData = new FormData()
+      formData.append("importExcelFile", file)
+
+        axios.post('/api/transactions/upload', formData)
+            .then(response => alert(response.data.message))
+        // not sure what I'll long-term do here in .then() but this works for now.
+    }
+
+    function updateFileUploadStatus(response) {
+      importUploadButton.parentElement.classList.remove("d-none")
+      importUploadButton.previousElementSibling.textContent = response.data.message
+
+      if (response.data.is_successful) {
+        importUploadButton.classList.remove("d-none")
+      }
+      else
+        importUploadButton.classList.add("d-none")
+    }
+
+    function hideImportUploadCheck() {
+      importUploadButton.parentElement.classList.add("d-none")
+    }
+</script>
