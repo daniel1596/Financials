@@ -1,37 +1,42 @@
 from pathlib import Path
 from shutil import copyfile
 
+from py.Config import db_location
 from py.database.FinancialsConnection import FinancialsConnection
 
-_database_location = 'db/financials.sqlite'
-
-"""This could be a wrapper class if needed around other FinancialsConnection methods."""
 
 def backup_db_file():
-    if not Path(_database_location).exists():
-        pass # this would be an error
+    __ensure_db_file_exists()
 
-    backup_file_location = f'Backup of {_database_location}'
-    copyfile(_database_location, backup_file_location)
+    backup_file_location = f'Backup of {db_location}'
+    copyfile(db_location, backup_file_location)
 
 
 def get_financial_transactions():
-    connection = FinancialsConnection(_database_location)
+    connection = FinancialsConnection()
 
-    # I think this approach more or less works. The downside is that I would have to modify the SQL
-    # in order to keep the Python fields in alignment.
+    # New syntax is working great - thanks Stackoverflow.
+    # The .description property allows me to match up Python dictionary keys with the SQL column mames.
     transactions_raw = connection.execute_sql_file('sql/Select_FinancialTransactions.sql')
+    names = [description[0] for description in transactions_raw.description]
 
-    return [
-        {'Amount': trans[0], 'Category': trans[1], 'Date': 'todo' } 
-        for trans in transactions_raw
-    ]
+    return [{ names[i]: trans[i] for i in range(len(names))} for trans in transactions_raw]
 
 
 def initialize_database_first_run():
-    if not Path(_database_location).exists():
-        pass # create the database file at the command line maybe?
+    __create_db()
 
-    connection = FinancialsConnection(_database_location)
+    connection = FinancialsConnection()
     connection.initialize_tables()
-    # connection.reset_data() # reset all data in the FinancialActivity table before Dad starts to use it
+
+
+def __create_db():
+    with open(db_location, 'w'):
+        pass
+
+    __ensure_db_file_exists()
+
+
+def __ensure_db_file_exists():
+    if not Path(db_location).exists():
+        raise IOError("An error occurred when attempting to access the database file.")

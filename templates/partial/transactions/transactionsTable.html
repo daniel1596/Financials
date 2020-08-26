@@ -1,3 +1,9 @@
+<div>
+    <p>
+        Below, find all your transactions. They are not yet editable, but that might be possible in a future release.
+        Filtering may soon be allowed as well.
+    </p>
+</div>
 <div class="d-flex justify-content-center">
     <div id="transactionsTable"></div>
 </div>
@@ -8,8 +14,7 @@
         columns: [
             { title: "Amount", field: "Amount" },
             { title: "Category", field: "Category" },
-            { title: "Date", field: "Date" } // may need special formatting here
-            // { title: "Amount", field: "ui.amount" }, // note - this syntax works! I didn't think it would. yay.
+            { title: "Date", field: "DateUI" }
         ],
         layout: "fitData"
     })

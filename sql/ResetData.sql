@@ -2,7 +2,9 @@
 -- Note that there is no "truncate table" in SQLite.
 -- See https://www.techonthenet.com/sqlite/truncate.php
 
--- But also... this could probably be done through Python. Although, is that dangerous?
--- Or perhaps less dangerous because Python would back everything up first.
+-- These two lines will be removed, or at least commented out, once we are ready to deploy to production.
+-- For debugging purposes, however, I will leave them here. Db schema is still in flux of course.
+DELETE FROM IncomeStatementLineItem
+DELETE FROM FinancialTransactionType
 
 DELETE FROM FinancialTransaction

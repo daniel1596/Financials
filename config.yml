@@ -1,0 +1,8 @@
+db_location: db/financials.sqlite
+# probably have some other information for db scripts
+
+is_development: True
+
+# Additional docs:
+# https://camel.readthedocs.io/en/latest/yamlref.html
+# https://pyyaml.org/wiki/PyYAMLDocumentation

@@ -11,9 +11,10 @@ CREATE TABLE FinancialTransactionType (
 
 INSERT INTO FinancialTransactionType (Category, IncomeStatementLineItemID)
 VALUES
-('Groceries', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1))
+('Groceries', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1)),
 -- ('Housing/Rent/??', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1))
-
+('Healthcare', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1)),
+('Utilities', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1))
 
 
 -- Using the "WITH" clause maybe? Might try this. See https://stackoverflow.com/a/56179189
