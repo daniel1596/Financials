@@ -1,6 +1,6 @@
 -- All transactions, including all dividends and stock purchases, will show up here.
 
-CREATE TABLE FinancialTransaction (
+CREATE TABLE IF NOT EXISTS FinancialTransaction (
   FinancialTransactionID INTEGER PRIMARY KEY,
   FinancialTransactionTypeID INTEGER NOT NULL,
   Amount REAL NOT NULL,
@@ -18,10 +18,12 @@ CREATE TABLE FinancialTransaction (
 INSERT INTO FinancialTransaction (FinancialTransactionTypeID, Amount, DateYear, DateMonth, DateDay)
 VALUES
 ((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Healthcare'), 50, 2020, 7, 13),
-((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Utilities'), 53.33, 2020, 7, 13)
+((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Utilities'), 53.33, 2020, 7, 13),
+((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Bank Account Interest'), 40.91, 2020, 6, 30),
+((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Bank Account Interest'), 47.74, 2020, 5, 29),
+((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Bank Account Interest'), 49.5, 2020, 4, 30),
+((SELECT FinancialTransactionTypeID FROM FinancialTransactionType WHERE Category = 'Bank Account Interest'), 52.57, 2020, 3, 31)
 
-
---    InterestIncome(40.91, date(2020, 6, 30)),
 --    InterestIncome(47.74, date(2020, 5, 29)),
 --    InterestIncome(49.5, date(2020, 4, 30)),
 --    InterestIncome(52.57, date(2020, 3, 31))

@@ -2,8 +2,8 @@ from flask import request
 
 from . import *
 from .response.CustomResponse import CustomResponse
-from ..database.DatabaseMethods import get_financial_transactions
-from ..financials.Quarter import Quarter
+from ..database.FinancialDatabaseHelper import FinancialDatabaseHelper
+from py.models.Quarter import Quarter
 from ..scripting.IncomeStatementFactory import IncomeStatementFactory
 from ..view_models.IncomeStatementsViewModel import IncomeStatementsViewModel
 from ..view_models.TransactionViewModel import TransactionViewModel
@@ -37,9 +37,11 @@ def generate_income_statements():
 
 @api.route('/transactions/list')
 def list_all_transactions():
+    db_helper = FinancialDatabaseHelper()
+
     # Technically, I believe we should only have one view-model per page... hmm. Can fix later.
     # Would have to create a separate class to call setattr() in the __init__ method.
-    view_models = [TransactionViewModel(t) for t in get_financial_transactions()]
+    view_models = [TransactionViewModel(t) for t in db_helper.get_financial_transactions()]
 
     return encode(view_models, unpicklable=False)
 

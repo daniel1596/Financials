@@ -3,20 +3,16 @@ from flask import Flask
 
 from py.blueprints.Api import api
 from py.blueprints.Pages import pages
-from py.database.DatabaseMethods import initialize_database_first_run
+from py.database.FinancialDatabaseHelper import FinancialDatabaseHelper
 
 app = Flask(__name__)
 app.register_blueprint(api)
 app.register_blueprint(pages)
 
-# Next objectives:
-# TODO: get the app to read from the database rather than an in-memory list
-# The view-model might remain similar but the Python class hierarchy is probably going to basically disappear.
-# As is probably at least one Enum. But that's ok. I'll be trimming back on the fat of this application,
-# and what will be left will be a working application that's well-built from the database layer up.
-# Also will be scriptable, secure, etc.
-# Really happy about how this is coming together so far. Feels like my previous work on similar apps
-# is paying off as I can figure out on this app. Tabulator, Vue, Sqlite3, Flask, SQL, Bootstrap. Living the dream.
+# TODO: should fix that front-end bug with Tabulator. Not sure what to make of that.
+# The bug is that the first Tabulator table loads great, but then when you switch to the same screen (in this SPA as it is currently),
+# it either needs to re-draw it first or what, I don't know.
+
 
 def run_web_app():
     app.run(debug=True)
@@ -32,7 +28,7 @@ def main():
     args = parse_arguments()
 
     if args.init_db:
-        initialize_database_first_run()
+        FinancialDatabaseHelper().initialize_database_first_run()
         return
 
     run_web_app()

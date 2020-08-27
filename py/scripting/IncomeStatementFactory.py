@@ -1,21 +1,21 @@
 from math import floor
-from functools import reduce
 from typing import Final, List
 
-from py.financials.SpecificQuarter import SpecificQuarter
-from py.financials.Quarter import Quarter
-from py.financials.income_statement.IncomeStatement import IncomeStatement
+from py.models.Quarter import Quarter
+from py.models.IncomeStatement import IncomeStatement
 
 
 class IncomeStatementFactory:
-    # If I need anything to be an instance of this class, I can make these methods @classmethods,
-    # so I can use e.g. the cls._year_count inside the methods.
-
-    @staticmethod
-    def generate_QOQ_statements(starting_year: int, starting_quarter: Quarter, column_count: int):
+    @classmethod
+    def generate_QOQ_statements(cls, starting_year: int, starting_quarter: Quarter, column_count: int):
         """
-        Generate a variable number of QOQ statements. Logic gets tricky but it works.
-        The premise is that there is an "initial/starting" year, "middle" years, and an "ending" year.
+        Generate a variable number of QOQ statements, divided into the following time periods:
+        - Starting year, [optional: middle year(s)], [optional: ending year]
+
+        The "middle year(s)" comprise (a) year(s) where all 4 quarters' worth of statements need to be generated.
+        The "ending year" is the last year - must be non-full - where statements are generated.
+
+        The code is relatively self-documenting but that's a quick refresher.
         """
 
         if starting_quarter.number >= column_count:
@@ -33,26 +33,29 @@ class IncomeStatementFactory:
 
         final_year = starting_year - year_count_four_statements - 1
 
-        middle_statements = [] if not year_count_four_statements else list(reduce(list.__add__, (
-            [IncomeStatement(y, q)] for y in range(starting_year - 1, final_year, -1) for q in Quarter.descending()
-        )))
+        # This was the original syntax, and I'm sure I had fun discovering the syntax, but it was also overkill.
+        # Simpler syntax below... keeping this for a little while as a reminder to think through things and not overcomplicate them.
+        # As you can see, I was concatenating one-item lists with reduce, which works, but all I needed was standard nested list comprehension! Haha
+        # middle_statements = [] if not year_count_four_statements else list(reduce(list.__add__, (
+        #     [IncomeStatement(y, q)] for y in cls._get_x_years_starting_at(starting_year-1, year_count_four_statements) for q in Quarter.descending()
+        # )))
+
+        middle_statements = [] if not year_count_four_statements else [
+            IncomeStatement(y, q) for y in cls._get_x_years_starting_at(starting_year-1, year_count_four_statements) for q in Quarter.descending()
+        ]
 
         last_statement_quarter = 4 - statement_count_oldest_year + 1  # e.g. if 1 statement final year, this is 4 - 1 + 1
         last_year_statements = [IncomeStatement(final_year, q) for q in Quarter.descending(end=last_statement_quarter)]
 
         return starting_year_statements + middle_statements + last_year_statements
 
-    @staticmethod
-    def generate_YOY_statements(starting_year: int, starting_quarter: Quarter, column_count: int):
-        return [IncomeStatement(year, starting_quarter) 
-            for year in IncomeStatementFactory._get_x_years_starting_at(starting_year, column_count)
-        ]
+    @classmethod
+    def generate_YOY_statements(cls, starting_year: int, starting_quarter: Quarter, column_count: int):
+        return [IncomeStatement(year, starting_quarter) for year in cls._get_x_years_starting_at(starting_year, column_count)]
     
-    @staticmethod
-    def generate_yearly_statements(starting_year: int, column_count: int):
-        return [IncomeStatement(year) 
-            for year in IncomeStatementFactory._get_x_years_starting_at(starting_year, column_count)
-        ]
+    @classmethod
+    def generate_yearly_statements(cls, starting_year: int, column_count: int):
+        return [IncomeStatement(year) for year in cls._get_x_years_starting_at(starting_year, column_count)]
 
     @staticmethod
     def _get_x_years_starting_at(starting_year: int, x: int) -> List[int]:

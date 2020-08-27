@@ -14,7 +14,6 @@ class FinancialsConnection:
         self._connection.close()
 
     def execute(self, sql: str):
-        # Trying this for debugging
         return self._connection.execute(sql)
 
     def execute_sql_file(self, sql_file_path: str, *, as_script=False):
@@ -33,18 +32,17 @@ class FinancialsConnection:
 
             return self._connection.execute(f.read())
 
-    def initialize_tables(self):
+    def create_tables(self):
         """
-        Reset the db and
+        Creating the tables for the db. Actually resetting the database is done in the method that calls this.
+        Thus there is *no need* to call the ResetData script here... in fact, that script may not be necessary.
         """
 
-        if is_development:
-            for file_path in [
-                'sql/ResetData.sql',
-                'sql/CreateInsert_IncomeStatementLineItem.sql',
-                'sql/CreateInsert_FinancialTransactionType.sql'
-            ]:
-                self.execute_sql_file(file_path, as_script=True)
+        for file_path in [
+            'sql/CreateInsert_IncomeStatementLineItem.sql',
+            'sql/CreateInsert_FinancialTransactionType.sql',
+            'sql/CreateInsert_FinancialTransaction.sql'
+        ]:
+            self.execute_sql_file(file_path, as_script=True)
 
-        self.execute_sql_file('sql/CreateInsert_FinancialTransaction.sql', as_script=True)
         self.close()

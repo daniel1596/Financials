@@ -11,10 +11,15 @@ CREATE TABLE FinancialTransactionType (
 
 INSERT INTO FinancialTransactionType (Category, IncomeStatementLineItemID)
 VALUES
+-- I wish we had variables here... ugh. Not sure I'd want to do this in Python though.
+('Bank Account Interest', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Interest Income')),
 ('Groceries', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1)),
--- ('Housing/Rent/??', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1))
+('Housing', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1)),
 ('Healthcare', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1)),
 ('Utilities', (SELECT IncomeStatementLineItemID FROM IncomeStatementLineItem WHERE Description = 'Operating Expenses' LIMIT 1))
+
+-- Other ideas: books, car maintenance, clothing, dining, education, entertainment, exercise, gifts, grocery,
+-- hygiene/gromming/personal care maybe?, household supplies, misc, travel (includes lodging)
 
 
 -- Using the "WITH" clause maybe? Might try this. See https://stackoverflow.com/a/56179189
