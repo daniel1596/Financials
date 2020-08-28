@@ -1,12 +1,12 @@
 from pathlib import Path
 from sqlite3 import connect
 
-from py.Config import db_location, is_development
+from py.Config import config
 
 
 class FinancialsConnection:
     def __init__(self):
-        self._connection = connect(database=db_location)
+        self._connection = connect(database=config.db_location)
 
     def close(self):
         # Not sure if this will be needed; copied from bookcase
