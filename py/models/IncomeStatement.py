@@ -24,8 +24,10 @@ class IncomeStatement:
         # Adding the rest of the fields to the dictionary that are calculated
         # This feels a tad hokey but let's get it working first
         self.line_items['Operating Income'] = self.line_items["Operating Revenue"] - self.line_items["Operating Expenses"]
-        self.line_items["Income Before Tax"] = self.line_items['Operating Income'] + self.line_items['Interest Income'] \
-                                               + self.line_items["Investment Income"] - self.line_items["Non-operating Expenses"]
+        self.line_items["Income Before Tax"] = \
+            self.line_items['Operating Income'] + self.line_items['Interest Income'] \
+            + self.line_items["Investment Income"] - self.line_items["Non-operating Expenses"]
+
         self.line_items["Net Income"] = self.line_items["Income Before Tax"] - self.line_items["Income Tax Loss (Gain)"]
         self.gains = 0
         self.losses = 0

@@ -23,10 +23,12 @@ class FinancialDatabaseHelper(DatabaseHelper):
 
         if (not year) and (not quarter):
             where = "1=1"
-        else:
-            # assuming we year won't be None if quarter is None, at least for now
+        elif not quarter:
             where = f"ft.DateYear = {year}"
-            where += f" AND ft.DateMonth >= {quarter.month_first} AND ft.DateMonth <= {quarter.month_last}" if quarter else ""
+        else:
+            where = f"ft.DateYear = {year}" \
+                    f" AND ft.DateMonth >= {quarter.month_first}" \
+                    f" AND ft.DateMonth <= {quarter.month_last}"
 
         sql = f"SELECT {fields_to_select} " \
               f"FROM FinancialTransaction ft " \
@@ -49,7 +51,7 @@ class FinancialDatabaseHelper(DatabaseHelper):
         if not include_calculated_line_items:
             query += " WHERE IsCalculatedLineItem = 0"
 
-        return [isil[0] for isil in connection.execute(query)]
+        return [line_items[0] for line_items in connection.execute(query)]
 
 
     def initialize_database_first_run(self):

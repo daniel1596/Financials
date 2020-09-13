@@ -1,26 +1,18 @@
-from pathlib import Path
-from shutil import copyfile
-
-from py.Config import config
+from py.helpers.ConfigHelper import config
+from py.helpers.FileHelper import FileHelper
 
 
 class DatabaseHelper:
     """Base class for handling db operations."""
 
-    def backup_db_file(self):
-        self._ensure_db_file_exists()
+    @classmethod
+    def backup_db_file(cls):
+        FileHelper.ensure_file_exists(config.db_location)
 
-        backup_file_location = f'Backup of {config.db_location}'
-        copyfile(config.db_location, backup_file_location)
-
-
-    def _create_db(self):
-        with open(config.db_location, 'w'):
-            pass
-
-        self._ensure_db_file_exists()
+        backup_file_path = f'Backup of {config.db_location}'
+        FileHelper.copy_file(config.db_location, backup_file_path)
 
 
-    def _ensure_db_file_exists(self):
-        if not Path(config.db_location).exists():
-            raise IOError("An error occurred when attempting to access the database file.")
+    @classmethod
+    def _create_db(cls):
+        FileHelper.create_file(config.db_location)

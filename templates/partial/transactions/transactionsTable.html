@@ -3,13 +3,30 @@
         Below, find all your transactions. They are not yet editable, but that might be possible in a future release.
         Filtering may soon be allowed as well.
     </p>
+    {# I don't 100% want to have to have a button-click here... but it's less buggy at least.
+        You can tell in the script I tried to make it load on the nav item click, but that didn't work and
+        I'm not sure why. #}
+    <button type="button" class="btn btn-primary mb-4" onclick="setupTransactionsTable(this)">
+        Load transactions
+    </button>
 </div>
 <div class="d-flex justify-content-center">
     <div id="transactionsTable"></div>
 </div>
 
 <script>
-    var transactionsTable = new Tabulator('#transactionsTable', {
+  {#let isTableLoaded = false#}
+  {#document.querySelector("nav a[href='#transactions']").addEventListener("click", e => {#}
+  {#  if (!isTableLoaded) {#}
+  {#   setupTransactionsTable()#}
+  {#   isTableLoaded = true#}
+  {#  }#}
+  {# })#}
+
+  let transactionsTable;
+
+  function setupTransactionsTable(elBtnLoadTransactions) {
+    transactionsTable = new Tabulator('#transactionsTable', {
         ajaxURL: '/api/transactions/list',
         columns: [
             { title: "Amount", field: "Amount" },
@@ -18,4 +35,7 @@
         ],
         layout: "fitData"
     })
+
+    elBtnLoadTransactions.classList.add("d-none")
+  }
 </script>

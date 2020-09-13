@@ -1,7 +1,7 @@
 from pathlib import Path
 from sqlite3 import connect
 
-from py.Config import config
+from py.helpers.ConfigHelper import config
 
 
 class FinancialsConnection:
@@ -34,8 +34,7 @@ class FinancialsConnection:
 
     def create_tables(self):
         """
-        Creating the tables for the db. Actually resetting the database is done in the method that calls this.
-        Thus there is *no need* to call the ResetData script here... in fact, that script may not be necessary.
+        Creates tables for the db. Gets run after resetting the db by opening the file in "write" mode.
         """
 
         for file_path in [

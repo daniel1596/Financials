@@ -9,10 +9,6 @@ app = Flask(__name__)
 app.register_blueprint(api)
 app.register_blueprint(pages)
 
-# TODO: should fix that front-end bug with Tabulator. Not sure what to make of that.
-# The bug is that the first Tabulator table loads great, but then when you switch to the same screen (in this SPA as it is currently),
-# it either needs to re-draw it first or what, I don't know.
-
 
 def run_web_app():
     app.run(debug=True)
