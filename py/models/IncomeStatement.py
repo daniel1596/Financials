@@ -1,6 +1,6 @@
 from typing import Optional
 
-from py.database.FinancialDatabaseHelper import FinancialDatabaseHandler
+from py.database.FinancialDatabaseHandler import FinancialDatabaseHandler
 from py.models.Quarter import Quarter
 
 

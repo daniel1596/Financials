@@ -1,6 +1,6 @@
 from typing import List
 
-from py.database.FinancialDatabaseHelper import FinancialDatabaseHandler
+from py.database.FinancialDatabaseHandler import FinancialDatabaseHandler
 from py.models.IncomeStatement import IncomeStatement
 
 

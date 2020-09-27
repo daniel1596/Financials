@@ -3,7 +3,7 @@ from flask import Flask
 
 from py.blueprints.Api import api
 from py.blueprints.Pages import pages
-from py.database.FinancialDatabaseHelper import FinancialDatabaseHandler
+from py.database.FinancialDatabaseHandler import FinancialDatabaseHandler
 from py.helpers.ConfigHelper import config
 from py.helpers.FileHelper import FileHelper
 
