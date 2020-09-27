@@ -13,7 +13,11 @@ class FinancialsConnection:
         self._connection.commit()
         self._connection.close()
 
-    def execute(self, sql: str):
+    def execute(self, sql: str, *, as_script: False):
+        if as_script:
+            self._connection.executescript(sql)
+            return  # there is no value to return; .executescript() does not return anything
+
         return self._connection.execute(sql)
 
     def execute_sql_file(self, sql_file_path: str, *, as_script=False):
@@ -24,13 +28,9 @@ class FinancialsConnection:
 
         if not Path(sql_file_path).exists():
             raise IOError(f'This file path cannot be found: {sql_file_path}')
-        
-        with open(sql_file_path, 'r') as f:
-            if as_script:
-                self._connection.executescript(f.read())
-                return
 
-            return self._connection.execute(f.read())
+        with open(sql_file_path, 'r') as f:
+            self.execute(f.read(), as_script=as_script)
 
     def create_tables(self):
         """

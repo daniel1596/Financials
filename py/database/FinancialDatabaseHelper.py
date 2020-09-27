@@ -38,7 +38,7 @@ class FinancialDatabaseHelper(DatabaseHelper):
         transactions_raw = self._connection.execute(sql)
 
         # New syntax is working great - thanks Stackoverflow.
-        # The .description property allows me to match up Python dictionary keys with the SQL column mames.
+        # The .description property allows me to match up Python dictionary keys with the SQL column names.
         names = [description[0] for description in transactions_raw.description]
 
         return [{ names[i]: trans[i] for i in range(len(names))} for trans in transactions_raw]

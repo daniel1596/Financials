@@ -12,6 +12,10 @@ class FileHelper:
 
     @classmethod
     def create_file(cls, path: str):
+        if not Path(path).parent.exists():
+            pass
+            # Path(path).parent.mkdir() # doesn't work
+
         with open(path, 'w'):
             pass
 

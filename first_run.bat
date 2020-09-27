@@ -12,3 +12,4 @@ echo.
 :: (Note - don't need to install npm. Vue is included via script reference.)
 
 
+pause

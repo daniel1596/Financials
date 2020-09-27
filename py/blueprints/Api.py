@@ -2,7 +2,7 @@ from flask import request
 
 from . import *
 from .response.CustomResponse import CustomResponse
-from ..database.FinancialDatabaseHelper import FinancialDatabaseHelper
+from py.database.FinancialDatabaseHelper import FinancialDatabaseHelper
 from py.models.Quarter import Quarter
 from ..scripting.IncomeStatementFactory import IncomeStatementFactory
 from ..view_models.IncomeStatementsViewModel import IncomeStatementsViewModel
