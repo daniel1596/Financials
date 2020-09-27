@@ -3,7 +3,7 @@ from flask import Flask
 
 from py.blueprints.Api import api
 from py.blueprints.Pages import pages
-from py.database.FinancialDatabaseHelper import FinancialDatabaseHelper
+from py.database.FinancialDatabaseHelper import FinancialDatabaseHandler
 from py.helpers.ConfigHelper import config
 from py.helpers.FileHelper import FileHelper
 
@@ -26,9 +26,10 @@ def main():
     args = parse_arguments()
 
     if args.init_db:
-        # TODO trying to fix this part... assumes db directory is already there.
-        FileHelper.create_file(config.db_location)
-        FinancialDatabaseHelper.initialize_database_first_run()
+        # The FileHelper part has to come first, or else the FinancialDatabaseHelper
+        # object can't be initialized.
+        FileHelper.create_file(config.db_path)
+        FinancialDatabaseHandler().init_financial_tables()
         return
 
     run_web_app()

@@ -11,10 +11,11 @@ class FileHelper:
         copyfile(old_path, new_path)
 
     @classmethod
-    def create_file(cls, path: str):
-        if not Path(path).parent.exists():
-            pass
-            # Path(path).parent.mkdir() # doesn't work
+    def create_file(cls, path: Path):
+        # Create the parent directory, if needed - only running this once.
+        # That's all that's needed for now, though it could be recursively called if needed.
+        if not path.parent.exists():
+            path.parent.mkdir()
 
         with open(path, 'w'):
             pass
@@ -22,6 +23,6 @@ class FileHelper:
         cls.ensure_file_exists(path)
 
     @classmethod
-    def ensure_file_exists(cls, path: str):
-        if not Path(path).exists():
+    def ensure_file_exists(cls, path: Path):
+        if not path.exists():
             raise IOError("An error occurred when attempting to access the file.")

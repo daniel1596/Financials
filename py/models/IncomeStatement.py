@@ -1,6 +1,6 @@
 from typing import Optional
 
-from py.database.FinancialDatabaseHelper import FinancialDatabaseHelper
+from py.database.FinancialDatabaseHelper import FinancialDatabaseHandler
 from py.models.Quarter import Quarter
 
 
@@ -13,7 +13,7 @@ class IncomeStatement:
         self.year = year
         self.quarter = quarter
 
-        db_helper = FinancialDatabaseHelper()
+        db_helper = FinancialDatabaseHandler()
         self.transactions = db_helper.get_financial_transactions(year, quarter, include_income_statement_line_item=True)
         self.line_items = {
             line_item_name: self._sum_amounts_for_line_item(line_item_name)
