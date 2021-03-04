@@ -4,7 +4,7 @@
       <div class="row justify-content-center mb-1">
         <label for="startingYearSelect" class="mr-1 mb-0">Start at: </label>
         <select id="startingYearSelect" v-model="selected.startingYear">
-            <option v-for="year in [2020, 2019]">[[ year ]]</option>
+            <option v-for="year in yearsCountingDown">[[ year ]]</option>
         </select>
         <select v-model="selected.startingQuarter" v-show="selected.analysisType !== 'Yearly'">
             <option v-for="quarter in [4, 3, 2, 1]" :value="quarter">Q[[ quarter ]]</option>
@@ -45,20 +45,33 @@
         analysisTypes: ['QOQ', 'YOY', 'Yearly'],
         apiUrlBase: "/api/income_statements",
         columnCountOptions: Array(20).fill().map((_,i) => i + 1), // 20 is an arbitrary max, but should be sufficient
-        incomeStatementTable: null,
+        current: {
+			quarter: [...Array(4).keys()]
+				.map(n => [n, n, n])
+				.reduce((a, b) => a.concat(b))
+				[new Date().getMonth()]
+				+ 1, // I have 1-indexing for quarters since it is Q1 (e.g.) in the business world
+			year: new Date().getFullYear()
+		},
+		incomeStatementTable: null,
         incomeStatements: [],
         selected: {
           analysisType: 'YOY',
           columnCount: 4,
-          startingQuarter: 3,
-          startingYear: 2020
+          startingQuarter: null, // set these to current year/quarter in mounted
+          startingYear: null
         }
       },
       computed: {
         apiUrl: function () {
           const { analysisType, columnCount, startingQuarter, startingYear } = this.selected
           return `${this.apiUrlBase}?starting_year=${startingYear}&starting_quarter=${startingQuarter}&analysisType=${analysisType}&columnCount=${columnCount}`
-        }
+        },
+		yearsCountingDown: function () {
+		  const yearsArray = endYear => Array.from({ length: (this.current.year - endYear) + 1}, (_, i) => this.current.year - i);
+		  
+		  return yearsArray(2019) // 2019 is our last year with data - eventually this would be even more dynamic
+		}
       },
       watch: {
         // There might be a slightly better way, but I think this watcher is all right. It's much better than it was.
@@ -103,6 +116,9 @@
       },
       mounted: async function () {
         await this.updateTableData()
+		
+		this.selected.startingQuarter = this.current.quarter
+		this.selected.startingYear = this.current.year
       }
     })
 </script>

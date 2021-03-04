@@ -4,15 +4,15 @@ from typing import List
 
 class Quarter(Enum):
     """No need for the fiscal year to differ from the calendar year, at least currently"""
-    Q1 = (1, 1, 3)
-    Q2 = (2, 4, 6)
-    Q3 = (3, 7, 9)
-    Q4 = (4, 10, 12)
+    Q1 = (1)
+    Q2 = (2)
+    Q3 = (3)
+    Q4 = (4)
 
-    def __init__(self, number: int, month_first: int, month_last: int):
+    def __init__(self, number: int):
         self.number = number
-        self.month_first = month_first
-        self.month_last = month_last
+        self.month_first = 3 * number - 2
+        self.month_last = 3 * number
 
     @property
     def previous_three_quarters(self) -> List['Quarter']:
